@@ -11,13 +11,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trino.gateway.ha.config;
+package io.trino.gateway.ha.clustermonitor;
 
-public enum ClusterStatsMonitorType
+import com.fasterxml.jackson.databind.JsonNode;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+public record JmxResponse(List<JmxAttribute> attributes)
 {
-    NOOP,
-    INFO_API,
-    UI_API,
-    JDBC,
-    JMX
+    public static JmxResponse fromJson(JsonNode json)
+    {
+        List<JmxAttribute> attrs = StreamSupport.stream(json.get("attributes").spliterator(), false)
+                .map(JmxAttribute::fromJson)
+                .collect(Collectors.toList());
+        return new JmxResponse(attrs);
+    }
 }
